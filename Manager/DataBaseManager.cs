@@ -12,7 +12,7 @@ public class DataBaseManager
     const string DB_CONNECTION = "Data Source=192.168.0.2,1433;Initial Catalog=DongleDB;User ID=pkh0308;Password=db79park";
     SqlConnection connection;
 
-    const string USER_DATA_PATH = "/Data/UserData.json";
+    const string USER_DATA_PATH = "/UserData.json";
     public UserData CurUserData { get; private set; }
 
     #region Initialize
@@ -88,13 +88,51 @@ public class DataBaseManager
     #endregion
 
     #region Get Score
-    public List<int> GetScoresFromRank(int capacity)
+    enum RankType
     {
-        List<int> scores = new List<int>();
-
-        // ToDo: 검색 쿼리 작성
-
-        return scores;
+        Mine,
+        Today,
+        All
     }
+
+    List<int> GetScores(int capacity, RankType type)
+    {
+        List<int> scoreList = new List<int>(capacity);
+
+        // DB 연결
+        connection.Open();
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = connection;
+
+        // 검색 쿼리 실행
+        switch(type)
+        {
+            case RankType.Mine:
+                cmd.CommandText = $"SELECT TOP {capacity} score FROM ScoreDatas WHERE userID = {CurUserData.UserId} ORDER BY score DESC";
+                break;
+            case RankType.Today:
+                cmd.CommandText = $"SELECT TOP {capacity} score FROM ScoreDatas WHERE DATEDIFF(dd, recordedTime, GETDATE()) = 0 ORDER BY score DESC";
+                break;
+            case RankType.All:
+                cmd.CommandText = $"SELECT TOP {capacity} score FROM ScoreDatas ORDER BY score DESC";
+                break;
+        }
+        SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+        DataSet ds = new DataSet();
+        adapter.Fill(ds, "ScoreDatas");
+
+        DataTable table = ds.Tables[0];
+        int count = table.Rows.Count;
+        for (int i = 0; i < count; i++)
+            scoreList.Add(Convert.ToInt32(table.Rows[i]["score"]));
+
+        // 연결 해제
+        connection.Close();
+        return scoreList;
+    }
+
+    public List<int> GetMyScores(int capacity) { return GetScores(capacity, RankType.Mine); }
+    public List<int> GetTodayScores(int capacity) { return GetScores(capacity, RankType.Today); }
+    public List<int> GetAllScores(int capacity) { return GetScores(capacity, RankType.All); }
     #endregion
 }

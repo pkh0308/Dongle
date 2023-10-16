@@ -7,6 +7,8 @@ public class UIManager
     Stack<UI_PopUp> _stack = new Stack<UI_PopUp>();
     Transform _baseTransform;
 
+    public bool HasPopUp { get { return  _stack.Count > 0; } }
+
     public void Init() { }
 
     #region UI Open
@@ -39,8 +41,11 @@ public class UIManager
     #region UI Close
     public void ClosePopUp(UI_PopUp popUp)
     {
-        if(_stack.Count == 0) 
+        if(_stack.Count == 0)
+        {
+            Debug.Log("### There is no PopUP");
             return;
+        }
 
         if (_stack.Peek() != popUp)
         {
@@ -48,6 +53,20 @@ public class UIManager
             return;
         }
 
+        UnityEngine.Object.Destroy(_stack.Pop().gameObject);
+    }
+
+    // Escape 입력 대응
+    public void ClosePopUp(bool pauseOff = false)
+    {
+        if (_stack.Count == 0)
+        {
+            Debug.Log("### There is no PopUP");
+            return;
+        }
+
+        if (pauseOff)
+            Managers.Game.PauseOff();
         UnityEngine.Object.Destroy(_stack.Pop().gameObject);
     }
     #endregion

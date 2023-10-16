@@ -53,6 +53,7 @@ public class UI_Base : MonoBehaviour
     protected void BindTexts(Type type) { Bind<TextMeshProUGUI>(type); }
     protected void BindIamags(Type type) { Bind<Image>(type); }
     protected void BindButtons(Type type) { Bind<Button>(type); }
+    protected void BindSlider(Type type) { Bind<Slider>(type); }
     #endregion
 
     #region Get Object
@@ -68,6 +69,7 @@ public class UI_Base : MonoBehaviour
     protected TextMeshProUGUI GetText(int idx) { return Get<TextMeshProUGUI>(idx); }
     protected Image GetImage(int idx) { return Get<Image>(idx); }
     protected Button GetButton(int idx) { return Get<Button>(idx); }
+    protected Slider GetSlider(int idx) { return Get<Slider>(idx); }
     #endregion
 
     #region Bind Event 

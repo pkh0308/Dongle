@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Managers : MonoBehaviour
@@ -20,16 +18,14 @@ public class Managers : MonoBehaviour
     public static SoundManager Sound { get { return _soundManager; } }
     public static DataBaseManager DB { get { return _databaseManager; } }
 
-    void Awake()
-    {
-        DontDestroyOnLoad(gameObject);
-
-        // 프레임 제한
-        Application.targetFrameRate = 60;
-    }
-
+    static bool _initialized;
     void Start()
     {
+        if (_initialized)
+            return;
+
+        _initialized = true;
+        // 매니저 클래스 초기화
         _gameManager.Init();
         _resourceManager.Init();
         _wfsManager.Init();
@@ -37,5 +33,9 @@ public class Managers : MonoBehaviour
         _uiManager.Init();
         _soundManager.Init();
         _databaseManager.Init();
+
+        DontDestroyOnLoad(gameObject);
+        // 프레임 제한
+        Application.targetFrameRate = 60;
     }
 }

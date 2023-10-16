@@ -1,10 +1,13 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+
 using Random = UnityEngine.Random;
 
 public class GameManager
 {
+    #region enums & variables
     string[] _dongleNames;
 
     public enum GameState
@@ -15,6 +18,14 @@ public class GameManager
     }
     public GameState CurState { get; private set; }
     public bool IsGameOver { get { return  CurState == GameState.GameOver; } }
+    public bool Paused { get; private set; }
+
+    enum Scenes
+    {
+        TitleScene,
+        MainScene
+    }
+    #endregion
 
     #region Initialize
     public void Init()
@@ -36,11 +47,12 @@ public class GameManager
     #region GameStart
     public void GameStart()
     {
+        // 메인 씬 로드
+        SceneManager.LoadScene(Scenes.MainScene.ToString());
         // 로딩 전부 완료 후 실행할 내용 등록
         Managers.Obj.SetCompleteCallBack(InitGame);
-
+        // 오브젝트 풀링
         Transform parent = new GameObject() { name = "Dongles" }.transform;
-
         for (int i = 0; i < _dongleNames.Length; i++)
             Managers.Obj.MakeObj<Dongle>(_dongleNames[i], 100, parent);
     }
@@ -48,8 +60,8 @@ public class GameManager
     void InitGame()
     {
         CurState = GameState.OnGame;
+        PauseOff();
         CreateNewDongle(true);
-        Managers.Sound.PlayBgm((int)SoundManager.Bgms.Bgm_Main);
     }
 
     public void Restart()
@@ -59,6 +71,7 @@ public class GameManager
         CurDongle = null;
 
         CurState = GameState.OnGame;
+        PauseOff();
         Managers.Sound.PlayBgm((int)SoundManager.Bgms.Bgm_Main);
         CreateNewDongle(true);
     }
@@ -87,7 +100,7 @@ public class GameManager
     {
         go1.SetActive(false);
         go2.SetActive(false);
-        GetScore(level++);
+        GetScore(++level);
 
         GameObject obj = Managers.Obj.GetObj(_dongleNames[level]);
         obj.transform.position = (go1.transform.position + go2.transform.position) / 2;
@@ -113,6 +126,11 @@ public class GameManager
     }
     #endregion
 
+    #region Pause
+    public void PauseOn() { Paused = true; Cursor.visible = true; }
+    public void PauseOff() { Paused = false; Cursor.visible = false; }
+    #endregion
+
     #region GameOver
     public void GameOver()
     {
@@ -120,12 +138,20 @@ public class GameManager
             return;
 
         CurState = GameState.GameOver;
-        Managers.UI.OpenPopUp<UI_GameOverPopUp>();
+        PauseOn();
         Managers.Sound.Pause();
         Managers.Sound.PlaySfx((int)SoundManager.Sfxs.Sfx_GameOver);
 
         // 점수 기록
         Managers.DB.AddScoreToRank(CurScore);
+    }
+
+    public void ToTitle()
+    {
+        CurState = GameState.Title;
+        Managers.Obj.ClearObjs();
+        Cursor.visible = true;
+        SceneManager.LoadScene(Scenes.TitleScene.ToString());
     }
     #endregion
 }

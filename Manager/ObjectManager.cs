@@ -10,7 +10,6 @@ public class ObjectManager
 
     #region Make Obj
     Dictionary<string, GameObject[]> _objs = new Dictionary<string, GameObject[]>();
-
     Dictionary<string, int> _loadCounts = new Dictionary<string, int>();
     Action _onLoadComplete;
     public void SetCompleteCallBack(Action callback) { _onLoadComplete = callback; }
@@ -109,6 +108,7 @@ public class ObjectManager
             for (int j = 0; j < arr.Length; j++)
                 UnityEngine.Object.Destroy(arr[j]);
         }
+        _objs.Clear();
     }
     #endregion
 }

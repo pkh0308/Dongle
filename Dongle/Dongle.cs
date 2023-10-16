@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 public class Dongle : MonoBehaviour
@@ -15,11 +13,14 @@ public class Dongle : MonoBehaviour
         rigid = GetComponent<Rigidbody2D>();
     }
 
+    bool _stop;
     void Update()
     {
-        // 게임 오버 시 시뮬 중단
-        if(rigid.simulated && Managers.Game.IsGameOver)
-            rigid.simulated = false;
+        if (_stop == Managers.Game.Paused || Dropped == false)
+            return;
+
+        _stop = Managers.Game.Paused;
+        rigid.simulated = !(_stop);
     }
 
     public void Drop()
@@ -30,9 +31,12 @@ public class Dongle : MonoBehaviour
     #region 충돌 판정
     void OnCollisionEnter2D(Collision2D coll)
     {
-        // 벽 외에 충돌 판정 시 드랍 처리
-        if(coll.gameObject.CompareTag(ConstVal.WALL) == false)
+        // 벽 외에 처음 충돌 시 드랍 처리
+        if(coll.gameObject.CompareTag(ConstVal.WALL) == false && Dropped == false)
+        {
             Dropped = true;
+            Managers.Sound.PlaySfx((int)SoundManager.Sfxs.Sfx_Attach);
+        }
 
         // 같은 레벨의 동글끼리 충돌 시 합체
         if (coll.gameObject.CompareTag(ConstVal.DONGLE) == false)
@@ -79,11 +83,14 @@ public class Dongle : MonoBehaviour
     }
     #endregion
 
-    #region OnEnable
+    #region OnEnable / OnDisable
+    Vector3 _outOfSight = Vector3.one * -100;
     void OnEnable()
     {
         rigid.simulated = false;
         Dropped = false;
+        transform.position = _outOfSight;
+        transform.rotation = Quaternion.identity;
     }
     #endregion
 }

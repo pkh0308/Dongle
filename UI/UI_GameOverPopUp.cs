@@ -54,7 +54,7 @@ public class UI_GameOverPopUp : UI_PopUp
 
     void Btn_ToTitle()
     {
-        
+        Managers.Game.ToTitle();
         ClosePopUp();
     }
     #endregion

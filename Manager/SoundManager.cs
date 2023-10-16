@@ -42,6 +42,7 @@ public class SoundManager
         for (int i = 0; i < names.Length; i++) 
         {
             GameObject s = new GameObject() { name = names[i] + "Source" };
+            s.transform.SetParent(sources.transform);
             _sources[i] = s.AddComponent<AudioSource>();
         }
         // Bgm 소스 루프 설정
@@ -93,5 +94,15 @@ public class SoundManager
         for (int i = 0; i < _sources.Length; i++)
             _sources[i].UnPause();
     }
+    #endregion
+
+    #region Option
+    void SetVolume(int idx, float value)
+    {
+        _sources[idx].volume = value;
+    }
+
+    public void SetBgmVolume(float value) { SetVolume((int)SoundType.Bgm, value); }
+    public void SetSfxVolume(float value) { SetVolume((int)SoundType.Sfx, value); }
     #endregion
 }
