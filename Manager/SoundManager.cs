@@ -29,6 +29,9 @@ public class SoundManager
     AudioSource[] _sources;
     string[] bgmNames;
     string[] sfxNames;
+
+    public float BgmVol { get; private set; }
+    public float SfxVol { get; private set; }
     #endregion
 
     #region Initialize
@@ -50,6 +53,12 @@ public class SoundManager
 
         bgmNames = Enum.GetNames(typeof(Bgms));
         sfxNames = Enum.GetNames(typeof(Sfxs));
+
+        // º¼·ý ¼³Á¤
+        _sources[(int)SoundType.Bgm].volume = Managers.DB.CurUserData.BgmVolume;
+        _sources[(int)SoundType.Sfx].volume = Managers.DB.CurUserData.SfxVolume;
+        BgmVol = _sources[(int)SoundType.Bgm].volume;
+        SfxVol = _sources[(int)SoundType.Sfx].volume;
     }
     #endregion
 
@@ -102,7 +111,7 @@ public class SoundManager
         _sources[idx].volume = value;
     }
 
-    public void SetBgmVolume(float value) { SetVolume((int)SoundType.Bgm, value); }
-    public void SetSfxVolume(float value) { SetVolume((int)SoundType.Sfx, value); }
+    public void SetBgmVolume(float value) { SetVolume((int)SoundType.Bgm, value); BgmVol = value; }
+    public void SetSfxVolume(float value) { SetVolume((int)SoundType.Sfx, value); SfxVol = value; }
     #endregion
 }

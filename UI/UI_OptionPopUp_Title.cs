@@ -1,12 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
 using SliderEvent = UnityEngine.UI.Slider.SliderEvent;
 
-public class UI_OptionPopUp : UI_PopUp
+public class UI_OptionPopUp_Title : UI_PopUp
 {
     #region Enums & Variables
     enum Texts
@@ -14,7 +13,6 @@ public class UI_OptionPopUp : UI_PopUp
         HeadText,
         BgmText,
         SfxText,
-        ToTitleBtnText,
         ExitBtnText
     }
 
@@ -26,7 +24,6 @@ public class UI_OptionPopUp : UI_PopUp
 
     enum Buttons
     {
-        ToTitleBtn,
         ExitBtn
     }
 
@@ -49,7 +46,6 @@ public class UI_OptionPopUp : UI_PopUp
 
         InitSlider();
 
-        GetButton((int)Buttons.ToTitleBtn).gameObject.AddComponent<UI_Base>().BindEvent(Btn_ToTitle);
         GetButton((int)Buttons.ExitBtn).gameObject.AddComponent<UI_Base>().BindEvent(Btn_Exit);
 
         return true;
@@ -67,16 +63,10 @@ public class UI_OptionPopUp : UI_PopUp
     #endregion
 
     #region Button Handler
-    void Btn_ToTitle()
-    {
-        Managers.Sound.PlaySfx((int)SoundManager.Sfxs.Sfx_Button);
-        Managers.Game.ToTitle();
-    }
-
     void Btn_Exit()
     {
         Managers.Sound.PlaySfx((int)SoundManager.Sfxs.Sfx_Button);
-        Managers.UI.ClosePopUp(true);
+        Managers.UI.ClosePopUp();
     }
     #endregion
 

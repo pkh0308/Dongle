@@ -31,11 +31,16 @@ public class Managers : MonoBehaviour
         _wfsManager.Init();
         _objectManager.Init();
         _uiManager.Init();
-        _soundManager.Init();
         _databaseManager.Init();
+        _soundManager.Init();
 
         DontDestroyOnLoad(gameObject);
         // 프레임 제한
         Application.targetFrameRate = 60;
+    }
+
+    void OnDestroy()
+    {
+        _databaseManager.SaveUserData();
     }
 }

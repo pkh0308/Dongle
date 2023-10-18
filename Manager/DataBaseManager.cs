@@ -1,5 +1,4 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
@@ -43,7 +42,7 @@ public class DataBaseManager
         cmd.Connection = connection;
 
         // 쿼리 작성 및 실행
-        cmd.CommandText = $"SELECT TOP 1 userId FROM ScoreDatas";
+        cmd.CommandText = $"SELECT TOP 1 userId FROM ScoreDatas ORDER BY userId DESC";
         SqlDataAdapter adapter = new SqlDataAdapter(cmd);
         DataSet ds = new DataSet();
         adapter.Fill(ds, "ScoreDatas");
@@ -52,7 +51,7 @@ public class DataBaseManager
         int count = table.Rows.Count;
         // 가장 높은 userId + 1, 데이터가 없다면 이니셜 값 사용 
         int userId = count > 0 ? Convert.ToInt32(table.Rows[0]["userId"]) + 1 : ConstVal.INITIAL_USER_ID;
-        CurUserData = new UserData() { UserId = userId };
+        CurUserData = new UserData() { UserId = userId, BgmVolume = 1.0f, SfxVolume = 1.0f };
         // 연결 해제
         connection.Close();
 
@@ -63,6 +62,9 @@ public class DataBaseManager
         byte[] datas = Encoding.UTF8.GetBytes(userDataStr);
         stream.Write(datas, 0, datas.Length);
         stream.Close();
+
+        // 더미데이터 기록(userId 중복 생성 방지용)
+        AddScoreToRank(0);
     }
     #endregion
 
@@ -74,8 +76,8 @@ public class DataBaseManager
         SqlCommand cmd = new SqlCommand();
         cmd.Connection = connection;
 
-        // 쿼리 작성 및 실행
-        cmd.CommandText = $"INSERT INTO ScoreDatas VALUES(@userId, @score, @recordedTime)";
+        // 쿼리 작성 및 실행(트랜잭션 테스트)
+        cmd.CommandText = $"BEGIN TRY BEGIN TRAN INSERT INTO ScoreDatas VALUES(@userId, @score, @recordedTime); COMMIT END TRY BEGIN CATCH ROLLBACK; END CATCH";
         string date = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss.fff");
         cmd.Parameters.Add("@userId", SqlDbType.Int).Value = CurUserData.UserId;
         cmd.Parameters.Add("@score", SqlDbType.Int).Value = score;
@@ -134,5 +136,22 @@ public class DataBaseManager
     public List<int> GetMyScores(int capacity) { return GetScores(capacity, RankType.Mine); }
     public List<int> GetTodayScores(int capacity) { return GetScores(capacity, RankType.Today); }
     public List<int> GetAllScores(int capacity) { return GetScores(capacity, RankType.All); }
+    #endregion
+
+    #region Save
+    public void SaveUserData()
+    {
+        // 볼륨 옵션 저장
+        CurUserData.BgmVolume = Managers.Sound.BgmVol;
+        CurUserData.SfxVolume = Managers.Sound.SfxVol;
+
+        string path = Application.persistentDataPath + USER_DATA_PATH;
+        string userDataStr = JsonUtility.ToJson(CurUserData);
+
+        FileStream stream = new FileStream(path, FileMode.Create);
+        byte[] datas = Encoding.UTF8.GetBytes(userDataStr);
+        stream.Write(datas, 0, datas.Length);
+        stream.Close();
+    }
     #endregion
 }

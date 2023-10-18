@@ -57,17 +57,19 @@ public class UIManager
     }
 
     // Escape 입력 대응
-    public void ClosePopUp(bool pauseOff = false)
+    public bool ClosePopUp(bool pauseOff = false)
     {
         if (_stack.Count == 0)
         {
             Debug.Log("### There is no PopUP");
-            return;
+            return false;
         }
 
         if (pauseOff)
             Managers.Game.PauseOff();
+
         UnityEngine.Object.Destroy(_stack.Pop().gameObject);
+        return true;
     }
     #endregion
 }
