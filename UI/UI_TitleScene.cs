@@ -36,6 +36,7 @@ public class UI_TitleScene : UI_Base
 
         InitBtns();
 
+        Managers.Game.VersionCheck();
         Destroy(GameObject.Find(ConstVal.LOADING_SCENE));
         Managers.Sound.PlayBgm((int)SoundManager.Bgms.Bgm_Main);
         return true;
@@ -72,12 +73,7 @@ public class UI_TitleScene : UI_Base
     void Btn_Exit()
     {
         Managers.Sound.PlaySfx((int)SoundManager.Sfxs.Sfx_Button);
-
-    #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
-    #else
-        Application.Quit();
-    #endif
+        Managers.Game.ExitGame();
     }
     #endregion
 

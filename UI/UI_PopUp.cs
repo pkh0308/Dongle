@@ -4,7 +4,6 @@ using UnityEngine;
 
 public class UI_PopUp : UI_Base
 {
-
     protected override bool Init()
     {
         if (base.Init() == false)

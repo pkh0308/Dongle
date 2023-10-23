@@ -44,8 +44,16 @@ public class GameManager
     }
     #endregion
 
+    #region VersionCheck
+    public void VersionCheck()
+    {
+        if (Managers.DB.GetGameVer() == false)
+            Managers.UI.OpenPopUp<UI_WrongVerPopUp>(false);
+    }
+    #endregion
+
     #region GameStart
-    public void GameStart()
+public void GameStart()
     {
         // 메인 씬 로드
         SceneManager.LoadScene(Scenes.MainScene.ToString());
@@ -100,8 +108,11 @@ public class GameManager
     {
         go1.SetActive(false);
         go2.SetActive(false);
-        GetScore(++level);
+        GetScore(level++);
+        if (level == ConstVal.MAX_LEVEL)
+            return;
 
+        // 다음 레벨 동글 생성
         GameObject obj = Managers.Obj.GetObj(_dongleNames[level]);
         obj.transform.position = (go1.transform.position + go2.transform.position) / 2;
         Dongle dongle = obj.GetComponent<Dongle>();
@@ -152,6 +163,17 @@ public class GameManager
         Managers.Obj.ClearObjs();
         Cursor.visible = true;
         SceneManager.LoadScene(Scenes.TitleScene.ToString());
+    }
+    #endregion
+
+    #region ExitGame
+    public void ExitGame()
+    {
+        #if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+        #else
+            Application.Quit();
+        #endif
     }
     #endregion
 }

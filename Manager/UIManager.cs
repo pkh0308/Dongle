@@ -22,7 +22,7 @@ public class UIManager
         });
     }
 
-    public void OpenPopUp<T>(string name = null, Transform parent = null, Action callback = null) where T : UI_PopUp
+    public void OpenPopUp<T>(bool doStack = true, string name = null, Transform parent = null, Action callback = null) where T : UI_PopUp
     {
         if (name == null)
             name = typeof(T).Name;
@@ -32,7 +32,9 @@ public class UIManager
         Managers.Resc.Instantiate(name, parent, (obj) =>
         {
             obj.transform.SetParent(parent);
-            _stack.Push(obj.AddComponent<T>());
+            T t = obj.AddComponent<T>();
+            if(doStack)
+                _stack.Push(t);
             callback?.Invoke();
         });
     }

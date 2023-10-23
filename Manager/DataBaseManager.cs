@@ -66,6 +66,27 @@ public class DataBaseManager
         // 더미데이터 기록(userId 중복 생성 방지용)
         AddScoreToRank(0);
     }
+
+    public bool GetGameVer()
+    {
+        // DB 연결
+        connection.Open();
+        SqlCommand cmd = new SqlCommand();
+        cmd.Connection = connection;
+
+        // 쿼리 작성 및 실행
+        cmd.CommandText = $"SELECT TOP 1 GameVersion FROM GameData";
+        SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+        DataSet ds = new DataSet();
+        adapter.Fill(ds, "GameData");
+
+        DataTable table = ds.Tables[0];
+        if (table.Rows.Count <= 0)
+            return false;
+        bool result = Convert.ToDouble(table.Rows[0]["GameVersion"]) == double.Parse(Application.version);
+        connection.Close();
+        return result;
+    }
     #endregion
 
     #region Add Score

@@ -68,9 +68,6 @@ public class Dongle : MonoBehaviour
 
     void Combine(GameObject other)
     {
-        if (Level == ConstVal.MAX_LEVEL)
-            return;
-
         // y축 좌표가 높은 쪽에서 호출
         if (transform.position.y > other.transform.position.y)
             Managers.Game.UpagrageDongle(gameObject, other, Level);
